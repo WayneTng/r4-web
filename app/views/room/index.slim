@@ -1,0 +1,7 @@
+h1 Welcome to Room
+p.container
+p#message
+  .messages-message-container
+    = render @messages if @messages
+p.input
+  input data-behavior="room_speaker" type="text"

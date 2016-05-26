@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
-  root 'home#index'
+  root 'room#index'
 
   mount ActionCable.server => '/cable'
-
-  resources :home, only: :index
 end

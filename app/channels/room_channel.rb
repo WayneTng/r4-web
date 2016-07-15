@@ -2,20 +2,24 @@
 class RoomChannel < ApplicationCable::Channel
   def subscribed
     @room_channel = "room_#{current_user.id}"
-    stream_from @room_channel
 
     @cusor = Message.where(:receivers.include(current_user.id)).all.raw.changes(include_initial: true)
 
-    Thread.new do
-      @cusor.each do |change|
-        data = {
-          operation: 'listing',
-          status: 'success',
-          data: change,
-          message: 'New messages created'
-        }
+    if Thread.current[:current_user_id].nil?
+      stream_from @room_channel
 
-        ActionCable.server.broadcast @room_channel, data
+      Thread.new do
+        Thread.current[:current_user_id] = current_user.id
+        @cusor.each do |change|
+          data = {
+            operation: 'listing',
+            status: 'success',
+            data: change,
+            message: 'New messages created'
+          }
+
+          ActionCable.server.broadcast @room_channel, data
+        end
       end
     end
   end
